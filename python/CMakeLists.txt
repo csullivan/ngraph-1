@@ -18,27 +18,33 @@ cmake_minimum_required (VERSION 3.1)
 
 project (pyngraph)
 
+if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+    message(FATAL_ERROR "Please call from nGraph !")
+endif()
+
+if (NOT NGRAPH_CPU_ENABLE OR NOT NGRAPH_DEX_ONLY)
+    message(WARNING "Python API requires NGRAPH_CPU_ENABLE and NGRAPH_DEX_ONLY!")
+    return()
+endif()
+
 include(ExternalProject)
+
+set(PYBIND11_SOURCE_DIR "${CMAKE_BINARY_DIR}/pybind11")
 
 ExternalProject_Add(
         pybind11
         GIT_REPOSITORY "https://github.com/pybind/pybind11.git"
         GIT_TAG "v2.2.4"
-        SOURCE_DIR "${CMAKE_BINARY_DIR}/pybind11"
+        SOURCE_DIR ${PYBIND11_SOURCE_DIR}
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
 )
 
-set(BUILD_SH_IN "${CMAKE_SOURCE_DIR}/python/build_wheel.sh.in")
-set(BUILD_SH    "${CMAKE_BINARY_DIR}/python/build_wheel.sh")
-configure_file(${BUILD_SH_IN} ${BUILD_SH} @ONLY)
+set(SETUP_PY_IN "${CMAKE_SOURCE_DIR}/python/setup.py.in")
+set(SETUP_PY    "${CMAKE_BINARY_DIR}/setup.py")
+configure_file(${SETUP_PY_IN} ${SETUP_PY})
 
-add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/python/dist/
-        POST_BUILD
-        WORKING_DIR ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND make -C ../ DESTDIR=python/_install install && bash build_wheel.sh
-)
-
-add_custom_target(python_wheel DEPENDS ngraph ${CMAKE_BINARY_DIR}/python/dist/)
+set(TOX_INI_IN "${CMAKE_SOURCE_DIR}/python/tox.ini.in")
+set(TOX_INI    "${CMAKE_BINARY_DIR}/tox.ini")
+configure_file(${TOX_INI_IN} ${TOX_INI})
