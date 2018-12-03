@@ -238,6 +238,8 @@ if (NGRAPH_ONNX_IMPORT_ENABLE)
     target_link_libraries(ngraph PRIVATE onnx_import)
 endif()
 
+set(NGRAPH_PYTHON_DIST_LIBS ${NGRAPH_PYTHON_DIST_LIBS} $<TARGET_FILE:ngraph> CACHE INTERNAL "ngraph_python_dist_libs")
+
 #-----------------------------------------------------------------------------------------------
 # Installation logic...
 #-----------------------------------------------------------------------------------------------

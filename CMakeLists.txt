@@ -109,6 +109,7 @@ option(NGRAPH_PYTHON_BUILD_ENABLE   "Enable build nGraph python package wheel" F
 if (LINUX)
 option(NGRAPH_MANYLINUX_ENABLE   "Enable manylinux support for nGraph" FALSE)
 endif()
+option(NGRAPH_OPENBLAS_ENABLE   "Enable build nGraph with OpenBLAS" FALSE)
 
 message(STATUS "NGRAPH_UNIT_TEST_ENABLE:      ${NGRAPH_UNIT_TEST_ENABLE}")
 message(STATUS "NGRAPH_TOOLS_ENABLE:          ${NGRAPH_TOOLS_ENABLE}")
@@ -287,6 +288,7 @@ endif()
 include(cmake/external_gtest.cmake)
 include(cmake/external_json.cmake)
 include(cmake/external_eigen.cmake)
+include(cmake/external_openblas.cmake)
 include(cmake/external_mkldnn.cmake)
 include(cmake/external_cldnn.cmake)
 

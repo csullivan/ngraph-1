@@ -155,6 +155,7 @@ if (NGRAPH_TBB_ENABLE)
         ${CMAKE_CURRENT_BINARY_DIR}/tbb_build/tbb_release/libtbb${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
     target_include_directories(libtbb SYSTEM INTERFACE ${TBB_ROOT}/include)
+    set(NGRAPH_PYTHON_DIST_LIBS ${NGRAPH_PYTHON_DIST_LIBS} ${CMAKE_CURRENT_BINARY_DIR}/tbb_build/tbb_release/libtbb${CMAKE_SHARED_LIBRARY_SUFFIX} CACHE INTERNAL "ngraph_python_dist_libs")
 endif()
 
 if (NGRAPH_CPU_ENABLE)
@@ -210,5 +211,6 @@ if (NGRAPH_CPU_ENABLE)
         set_property(TARGET cpu_backend APPEND PROPERTY LINK_FLAGS "-Wl,-Bsymbolic-functions -Wl,--exclude-libs=ALL")
     endif()
 
+    set(NGRAPH_PYTHON_DIST_LIBS ${NGRAPH_PYTHON_DIST_LIBS} $<TARGET_FILE:cpu_backend> CACHE INTERNAL "ngraph_python_dist_libs")
     install(TARGETS cpu_backend LIBRARY DESTINATION ${NGRAPH_INSTALL_LIB})
 endif()

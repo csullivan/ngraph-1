@@ -14,10 +14,6 @@
 # limitations under the License.
 # ******************************************************************************
 
-cmake_minimum_required (VERSION 3.1)
-
-project (pyngraph)
-
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
     message(FATAL_ERROR "Please call from nGraph !")
 endif()
@@ -26,6 +22,18 @@ if (NOT NGRAPH_CPU_ENABLE OR NOT NGRAPH_DEX_ONLY)
     message(WARNING "Python API requires NGRAPH_CPU_ENABLE and NGRAPH_DEX_ONLY!")
     return()
 endif()
+
+find_package(PythonInterp 2.7 REQUIRED)
+find_program(VIRTUALENV virtualenv)
+if (NOT VIRTUALENV)
+    message(FATAL_ERROR "Please install virtualenv!")
+endif()
+
+message(STATUS "Python:" ${PYTHON_EXECUTABLE})
+
+foreach(_dep_lib ${NGRAPH_PYTHON_DIST_LIBS})
+    message(STATUS "Python dep lib:" ${_dep_lib})
+endforeach()
 
 include(ExternalProject)
 
@@ -48,3 +56,15 @@ configure_file(${SETUP_PY_IN} ${SETUP_PY})
 set(TOX_INI_IN "${CMAKE_SOURCE_DIR}/python/tox.ini.in")
 set(TOX_INI    "${CMAKE_BINARY_DIR}/tox.ini")
 configure_file(${TOX_INI_IN} ${TOX_INI})
+
+
+add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/wheel.timestamp
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMAND ${VIRTUALENV} -p ${PYTHON_EXECUTABLE} .venv
+        COMMAND ./.venv/bin/python setup.py bdist_wheel
+        COMMAND touch wheel.timestamp
+        DEPENDS pybind11 ngraph cpu_backend
+)
+
+add_custom_target(python_wheel DEPENDS ${CMAKE_BINARY_DIR}/wheel.timestamp)
